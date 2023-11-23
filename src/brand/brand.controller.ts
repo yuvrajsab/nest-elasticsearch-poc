@@ -21,7 +21,7 @@ export class BrandController {
 
   @Get('/:id')
   async getBrand(@Param('id', ParseIntPipe) id: number) {
-    const brand = await this.brandService.getBrand(id);
+    const brand = await this.brandService.getBrandWithCars(id);
 
     if (!brand) {
       throw new NotFoundException();

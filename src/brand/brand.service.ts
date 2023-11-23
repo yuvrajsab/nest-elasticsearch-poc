@@ -15,6 +15,14 @@ export class BrandService {
       where: {
         id: id,
       },
+    });
+  }
+
+  getBrandWithCars(id: number) {
+    return this.prismaService.brand.findFirst({
+      where: {
+        id: id,
+      },
       include: {
         cars: true,
       },

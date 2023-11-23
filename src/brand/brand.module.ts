@@ -7,5 +7,6 @@ import { BrandService } from './brand.service';
   imports: [PrismaModule],
   controllers: [BrandController],
   providers: [BrandService],
+  exports: [BrandService],
 })
 export class BrandModule {}
