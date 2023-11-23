@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   NotFoundException,
+  OnModuleInit,
   Param,
   ParseIntPipe,
   Post,
@@ -17,7 +18,7 @@ import { ElasticSearchHelperService } from 'src/elasticsearch-helper/elasticsear
 import { SearchDto } from './dto/search.dto';
 
 @Controller('/cars')
-export class CarController {
+export class CarController implements OnModuleInit {
   private indexName = 'cars';
 
   constructor(
@@ -25,6 +26,13 @@ export class CarController {
     private brandService: BrandService,
     private elasticSearchHelperService: ElasticSearchHelperService,
   ) {}
+
+  async onModuleInit() {
+    // create index if not exists
+    if (!(await this.elasticSearchHelperService.indexExists(this.indexName))) {
+      await this.elasticSearchHelperService.createIndex(this.indexName);
+    }
+  }
 
   async validateBrandExists(brandId: number) {
     const brand = await this.brandService.getBrand(brandId);
