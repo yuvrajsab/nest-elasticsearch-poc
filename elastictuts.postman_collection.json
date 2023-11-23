@@ -1,0 +1,167 @@
+{
+	"info": {
+		"_postman_id": "82592a1f-2428-40dd-8178-eda55a5337a8",
+		"name": "elastictuts",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "22847306"
+	},
+	"item": [
+		{
+			"name": "brands",
+			"item": [
+				{
+					"name": "get all brands",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/brands"
+					},
+					"response": []
+				},
+				{
+					"name": "get a brand",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/brands/1"
+					},
+					"response": []
+				},
+				{
+					"name": "add brand",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"hundai\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/brands"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "cars",
+			"item": [
+				{
+					"name": "get all cars",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/cars"
+					},
+					"response": []
+				},
+				{
+					"name": "search cars",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"query\": {\r\n    \"fuzzy\": {\r\n      \"fuelType\": \"petrol\"\r\n    }\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/cars/search"
+					},
+					"response": []
+				},
+				{
+					"name": "get a car",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/cars/2"
+					},
+					"response": []
+				},
+				{
+					"name": "delete a car",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{base_url}}/cars/4"
+					},
+					"response": []
+				},
+				{
+					"name": "add car",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"model\": \"2016 Honda City\",\r\n    \"type\": \"manual\",\r\n    \"fuelType\": \"Petrol\",\r\n    \"engineCapacity\": \"2000 cc\",\r\n    \"brandId\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/cars"
+					},
+					"response": []
+				},
+				{
+					"name": "update car",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"model\": \"2012 Honda City\",\r\n    \"type\": \"Manual\",\r\n    \"fuelType\": \"petrol\",\r\n    \"engineCapacity\": \"1490 cc\",\r\n    \"brandId\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/cars/1"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

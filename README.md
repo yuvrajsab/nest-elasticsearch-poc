@@ -2,6 +2,12 @@
 
 This is a proof of concept showcasing the integration of NestJS with Elasticsearch.
 
+## Postman collection
+
+You can find Postman collection in this repo: `/elastictuts.postman_collection.json`.
+
+Just download this file and import it in you Postman.
+
 ## Installation
 
 ### Pre-requisite
