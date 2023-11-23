@@ -13,12 +13,17 @@ import {
 import { CarService } from './car.service';
 import { CreateDto } from './dto/create.dto';
 import { BrandService } from 'src/brand/brand.service';
+import { ElasticSearchHelperService } from 'src/elasticsearch-helper/elasticsearch-helper.service';
+import { SearchDto } from './dto/search.dto';
 
 @Controller('/cars')
 export class CarController {
+  private indexName = 'cars';
+
   constructor(
     private carService: CarService,
     private brandService: BrandService,
+    private elasticSearchHelperService: ElasticSearchHelperService,
   ) {}
 
   async validateBrandExists(brandId: number) {
@@ -37,20 +42,73 @@ export class CarController {
     return car;
   }
 
+  @Get('/search')
+  searchCars(@Body() searchDto: SearchDto) {
+    return this.elasticSearchHelperService.searchDocument(
+      this.indexName,
+      searchDto.query,
+    );
+  }
+
   @Get('/')
-  getCars() {
-    return this.carService.getCars();
+  async getCars() {
+    let result;
+
+    result = await this.elasticSearchHelperService.searchDocument(
+      this.indexName,
+      {
+        match_all: {},
+      },
+    );
+
+    result = result['hits']['hits'];
+
+    // fallback
+    if (!result) {
+      result = await this.carService.getCars();
+    }
+
+    return result;
   }
 
   @Get('/:id')
   async getCar(@Param('id', ParseIntPipe) id: number) {
-    return this.getCarOr404(id);
+    let result;
+
+    try {
+      result = await this.elasticSearchHelperService.getDocument(
+        this.indexName,
+        id.toString(),
+      );
+      result = result['_source'];
+    } catch (e) {
+      // fallback
+      result = await this.getCarOr404(id);
+      // insert into ES
+      if (result) {
+        await this.elasticSearchHelperService.insertDocument(
+          this.indexName,
+          result,
+          result['id'],
+        );
+      }
+    }
+
+    return result;
   }
 
   @Post('/')
   async addCar(@Body() createDto: CreateDto) {
     await this.validateBrandExists(createDto.brandId);
-    return this.carService.addCar(createDto);
+    const result = await this.carService.addCar(createDto);
+
+    await this.elasticSearchHelperService.insertDocument(
+      this.indexName,
+      result,
+      result.id.toString(),
+    );
+
+    return result;
   }
 
   @Put('/:id')
@@ -60,12 +118,27 @@ export class CarController {
   ) {
     await this.validateBrandExists(updateDto.brandId);
     await this.getCarOr404(id);
-    return this.carService.updateCar(id, updateDto);
+
+    const result = await this.carService.updateCar(id, updateDto);
+
+    await this.elasticSearchHelperService.replaceDocument(
+      this.indexName,
+      result.id.toString(),
+      result,
+    );
+
+    return result;
   }
 
   @Delete('/:id')
   async deleteCar(@Param('id', ParseIntPipe) id: number) {
     await this.getCarOr404(id);
+
+    await this.elasticSearchHelperService.deleteDocument(
+      this.indexName,
+      id.toString(),
+    );
+
     return this.carService.deleteCar(id);
   }
 }
