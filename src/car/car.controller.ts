@@ -30,7 +30,40 @@ export class CarController implements OnModuleInit {
   async onModuleInit() {
     // create index if not exists
     if (!(await this.elasticSearchHelperService.indexExists(this.indexName))) {
-      await this.elasticSearchHelperService.createIndex(this.indexName);
+      const indexMappings = {
+        properties: {
+          model: {
+            type: 'text',
+          },
+          type: {
+            type: 'keyword',
+          },
+          fuelType: {
+            type: 'keyword',
+          },
+          engineCapacity: {
+            type: 'text',
+          },
+          brandId: {
+            type: 'keyword',
+          },
+          brand: {
+            properties: {
+              id: {
+                type: 'keyword',
+              },
+              name: {
+                type: 'text',
+              },
+            },
+          },
+        },
+      };
+      await this.elasticSearchHelperService.createIndex(
+        this.indexName,
+        undefined,
+        indexMappings,
+      );
     }
   }
 
@@ -56,6 +89,56 @@ export class CarController implements OnModuleInit {
       this.indexName,
       searchDto.query,
     );
+  }
+
+  @Get('/custom-search/:query')
+  searchCarsCustom(@Param('query') query: string) {
+    return this.elasticSearchHelperService.searchDocument(this.indexName, {
+      bool: {
+        should: [
+          {
+            match: {
+              model: {
+                query: query,
+                fuzziness: 'auto',
+              },
+            },
+          },
+          {
+            match: {
+              engineCapacity: {
+                query: query,
+                fuzziness: 'auto',
+              },
+            },
+          },
+          {
+            match: {
+              'brand.name': {
+                query: query,
+                fuzziness: 'auto',
+              },
+            },
+          },
+          {
+            term: {
+              type: {
+                value: query,
+                case_insensitive: true,
+              },
+            },
+          },
+          {
+            term: {
+              fuelType: {
+                value: query,
+                case_insensitive: true,
+              },
+            },
+          },
+        ],
+      },
+    });
   }
 
   @Get('/')

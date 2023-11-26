@@ -11,14 +11,28 @@ export class ElasticSearchHelperService {
     });
   }
 
-  async createIndex(index: string) {
+  async createIndex(
+    index: string,
+    settings?: Record<string, any>,
+    mappings?: Record<string, any>,
+  ) {
     if (await this.indexExists(index)) {
       return;
     }
 
-    return this.elasticSearchService.indices.create({
+    const options = {
       index: index,
-    });
+    };
+
+    if (settings) {
+      options['settings'] = settings;
+    }
+
+    if (mappings) {
+      options['mappings'] = mappings;
+    }
+
+    return this.elasticSearchService.indices.create(options);
   }
 
   async getDocument(index: string, id: string) {
